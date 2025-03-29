@@ -2,3 +2,4 @@ Flask
 pycryptodome
 Pillow
 python-dotenv
+gunicorn
