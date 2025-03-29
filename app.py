@@ -2,9 +2,17 @@ from flask import Flask, render_template
 from routes.ctf_helpers import ctf_helpers_bp
 from routes.cryptography import cryptography_bp
 from routes.digital_forensics import digital_forensics_bp
-import MySQLdb.cursors
-import pymysql.cursors
-pymysql.install_as_MySQLdb()
+from flask import Flask
+
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+    return 'Hello from CyberNest!'
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
 
 
 app = Flask(__name__)
