@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EXIF Editor</title>
+</head>
+<body>
+    <h1>EXIF Metadata Editor</h1>
+    <form id="exifForm" enctype="multipart/form-data">
+        <input type="file" name="image" id="image" required>
+        <input type="text" name="exif_data" id="exif_data" placeholder="Enter new EXIF Artist tag">
+        <button type="submit">Modify EXIF</button>
+    </form>
+
+    <h2>Updated Image:</h2>
+    <img id="outputImage" style="max-width: 100%; display: none;">
+
+    <script>
+        document.getElementById("exifForm").onsubmit = async function(e) {
+            e.preventDefault();
+            let formData = new FormData(this);
+            let response = await fetch("/edit-exif/modify", {
+                method: "POST",
+                body: formData
+            });
+            let result = await response.json();
+            if (result.image) {
+                document.getElementById("outputImage").src = "data:image/jpeg;base64," + result.image;
+                document.getElementById("outputImage").style.display = "block";
+            } else {
+                alert(result.error);
+            }
+        };
+    </script>
+</body>
+</html>

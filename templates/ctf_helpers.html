@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <title>CTF Helpers</title>
+</head>
+<body>
+    <header>
+        <h1>CTF Helpers</h1>
+    </header>
+    <main>
+        <form id="ctf-form">
+            <label for="input_data">Input Data:</label>
+            <input type="text" id="input_data" placeholder="Enter encoded data..." required>
+            <button type="submit">Detect Base</button>
+        </form>
+        <div id="result"></div>
+    </main>
+    <script>
+        document.getElementById('ctf-form').onsubmit = async function(event) {
+            event.preventDefault();
+            const inputData = document.getElementById('input_data').value;
+            try {
+                const response = await fetch('/ctf-helpers/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ input_data: inputData })
+                });
+                if (!response.ok) throw new Error('Network response was not ok');
+                const result = await response.json();
+                document.getElementById('result').innerText = 'Detected Bases: ' + result.detected_bases.join(', ');
+            } catch (error) {
+                document.getElementById('result').innerText = 'Error: ' + error.message;
+            }
+        };
+    </script>
+</body>
+</html>

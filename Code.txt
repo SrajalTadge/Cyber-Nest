@@ -1,0 +1,19 @@
+from flask import Flask, render_template
+from routes.ctf_helpers import ctf_helpers_bp
+from routes.cryptography import cryptography_bp
+from routes.digital_forensics import digital_forensics_bp
+
+app = Flask(__name__)
+app.config.from_object('config.Config')
+
+# Register Blueprints for modular routes
+app.register_blueprint(ctf_helpers_bp)
+app.register_blueprint(cryptography_bp)
+app.register_blueprint(digital_forensics_bp)
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+if __name__ == '__main__':
+    app.run(debug=True)

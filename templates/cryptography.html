@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <title>Cryptography</title>
+</head>
+<body>
+    <header>
+        <h1>Cryptography</h1>
+    </header>
+    <main>
+        <section>
+            <h2>Encryption</h2>
+            <form id="encrypt-form">
+                <label for="data">Data:</label>
+                <input type="text" id="data" placeholder="Enter text to encrypt" required>
+                <label for="enc_key">Key:</label>
+                <input type="text" id="enc_key" placeholder="Enter encryption key" required>
+                <button type="submit">Encrypt</button>
+            </form>
+            <div id="encrypt-result"></div>
+        </section>
+        <hr>
+        <section>
+            <h2>Decryption</h2>
+            <form id="decrypt-form">
+                <label for="encrypted_data">Encrypted Data (JSON):</label>
+                <textarea id="encrypted_data" placeholder='{"nonce": "...", "tag": "...", "ciphertext": "..."}' required></textarea>
+                <label for="dec_key">Key:</label>
+                <input type="text" id="dec_key" placeholder="Enter decryption key" required>
+                <button type="submit">Decrypt</button>
+            </form>
+            <div id="decrypt-result"></div>
+        </section>
+    </main>
+    <script>
+        // Encryption form submission
+        document.getElementById('encrypt-form').onsubmit = async function(event) {
+            event.preventDefault();
+            const data = document.getElementById('data').value;
+            const key = document.getElementById('enc_key').value;
+            try {
+                const response = await fetch('/cryptography/encrypt', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ data: data, key: key })
+                });
+                if (!response.ok) throw new Error('Network response was not ok');
+                const result = await response.json();
+                if (result.error) {
+                    document.getElementById('encrypt-result').innerText = 'Error: ' + result.error;
+                } else {
+                    document.getElementById('encrypt-result').innerText = 'Encrypted Data: ' + JSON.stringify(result.encrypted_data);
+                }
+            } catch (error) {
+                document.getElementById('encrypt-result').innerText = 'Error: ' + error.message;
+            }
+        };
+
+        // Decryption form submission
+        document.getElementById('decrypt-form').onsubmit = async function(event) {
+            event.preventDefault();
+            const encryptedDataText = document.getElementById('encrypted_data').value;
+            const key = document.getElementById('dec_key').value;
+            let encryptedData;
+            try {
+                encryptedData = JSON.parse(encryptedDataText);
+            } catch (error) {
+                document.getElementById('decrypt-result').innerText = 'Invalid JSON format';
+                return;
+            }
+            try {
+                const response = await fetch('/cryptography/decrypt', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ encrypted_data: encryptedData, key: key })
+                });
+                if (!response.ok) throw new Error('Network response was not ok');
+                const result = await response.json();
+                if (result.error) {
+                    document.getElementById('decrypt-result').innerText = 'Error: ' + result.error;
+                } else {
+                    document.getElementById('decrypt-result').innerText = 'Decrypted Text: ' + result.plain_text;
+                }
+            } catch (error) {
+                document.getElementById('decrypt-result').innerText = 'Error: ' + error.message;
+            }
+        };
+    </script>
+</body>
+</html>
